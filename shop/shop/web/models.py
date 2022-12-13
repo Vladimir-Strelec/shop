@@ -1,43 +1,32 @@
-from django.contrib.auth.base_user import AbstractBaseUser
-from django.contrib.auth.hashers import make_password
-from django.contrib.auth.models import User
 from django.core.validators import MinLengthValidator
-from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
-
 from django.db import models
 
-from django.db.models.signals import pre_save
-from django.dispatch import receiver
-
-from shop.web.custom_validators import validate_only_letters
+from shop.account.models import UserShop
+from shop.validators.custom_validators import validate_only_letters
 
 
-class UserShop(models.Model):
-    name = models.CharField("Name", max_length=150, validators=(MinLengthValidator(2), validate_only_letters), )
-    password = models.CharField("Password", max_length=50)
-    email = models.EmailField("Email", error_messages={
-        "unique": _(f"A Email with that Emails already exists."),
-    }, )
-    telephone = models.IntegerField("Telephone number")
-    address = models.CharField("Address", max_length=300)
-    is_staff = models.BooleanField("staff status", default=False, )
-    is_active = models.BooleanField("active", default=True, )
-    data_joined = models.DateTimeField("Data joined", default=timezone.now)
-
-    def set_password(self, raw_password):
-        self.password = make_password(raw_password)
-        self._password = raw_password
-        return self.password
-
-    class Meta:
-        verbose_name = _("user")
-        verbose_name_plural = _("users")
+class Category(models.Model):
+    title = models.CharField("Title", max_length=100)
+    url = models.SlugField(max_length=160, unique=True)
+    is_active_in_filter = models.BooleanField("Is activ in filters", default=False)
+    is_active_in_bank = models.BooleanField("Is activ in bank", default=False)
 
     def __str__(self):
-        return f"{self.name} - {self.email}"
+        return f"{self.title}"
 
 
-@receiver(pre_save, sender=UserShop)
-def hashing(sender, instance, **kwargs):
-    instance.password = instance.set_password(instance.password)
+class Product(models.Model):
+    name = models.CharField("Name", max_length=100)
+    image = models.ImageField("Image", upload_to='images/%Y-%m-%d/')
+    description = models.TextField("Description")
+    price = models.DecimalField("Price", max_digits=5, decimal_places=2)
+    new_price = models.DecimalField("New price", max_digits=5, decimal_places=2, blank=True, null=True)
+    manufacturer = models.CharField("Manufacturer", max_length=160, validators=(MinLengthValidator(2),
+                                                                                validate_only_letters))
+    promotion = models.BooleanField("Promotion", default=False)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    owner = models.ForeignKey(UserShop, on_delete=models.CASCADE, blank=True, null=True)
+    url = models.SlugField(max_length=160, unique=True)
+
+    def __str__(self):
+        return f"{self.name} - {self.price}$ - {self.category}"

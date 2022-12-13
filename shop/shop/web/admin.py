@@ -1,6 +1,8 @@
 from django.contrib import admin
-from django.contrib.auth.models import User
 
-from shop.web.models import UserShop
+from shop.web.models import Category, Product
 
-admin.site.register(UserShop)
+admin.site.register(Category)
+admin.site.register(Product)
+
+

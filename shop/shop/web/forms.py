@@ -1,10 +1,12 @@
-from django.forms.models import ModelForm
-from django.views.generic.edit import ModelFormMixin
+from django import forms
 
-from shop.web.models import UserShop
+from shop.account.models import UserShop
+from shop.web.models import Product, Category
 
 
-class RegisterUserForm(ModelForm):
+class CreateProductForm(forms.ModelForm):
+
     class Meta:
-        model = UserShop
-        fields = '__all__'
+        model = Product
+        # fields = '__all__'
+        fields = ['name', 'image', 'description', 'price', 'new_price', 'manufacturer', 'promotion', 'category', 'url']
