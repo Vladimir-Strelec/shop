@@ -1,3 +1,5 @@
+import uuid
+
 from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth.models import User
 from django.core.validators import MinLengthValidator
@@ -10,7 +12,7 @@ from django.db.models.signals import pre_save
 from django.dispatch import receiver
 
 from shop.validators.custom_validators import validate_only_letters
-
+User
 
 class UserShop(models.Model):
     name = models.CharField("Name", max_length=150, validators=(MinLengthValidator(2), validate_only_letters), )
@@ -21,12 +23,17 @@ class UserShop(models.Model):
     telephone = models.IntegerField("Telephone number")
     address = models.CharField("Address", max_length=300)
     data_joined = models.DateTimeField("Data joined", default=timezone.now)
-    slug = models.SlugField(max_length=160, unique=True)
+
     is_active = models.BooleanField(default=True)
 
     class Meta:
         verbose_name = _("user")
         verbose_name_plural = _("users")
+
+    def set_password(self, raw_password):
+        self.password = make_password(raw_password)
+        self._password = raw_password
+        return self.password
 
     def check_password(self, raw_password):
 
@@ -37,11 +44,6 @@ class UserShop(models.Model):
             self.save(update_fields=["password"])
 
         return check_password(raw_password, self.password, setter)
-
-    def set_password(self, raw_password):
-        self.password = make_password(raw_password)
-        self._password = raw_password
-        return self.password
 
     def __str__(self):
         return f"{self.name} - {self.email}"

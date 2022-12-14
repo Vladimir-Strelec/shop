@@ -9,9 +9,6 @@ class RegisterUserForm(forms.models.ModelForm):
         model = UserShop
         fields = '__all__'
 
-    def get_initial_for_field(self, field, field_name):
-        a=5
-
     def save(self, *args, **kwargs):
         user = UserShop.objects.create(**self.cleaned_data)
         user.password = user.set_password(user.password)

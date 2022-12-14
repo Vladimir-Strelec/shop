@@ -4,7 +4,7 @@ from django.contrib import auth
 from django.contrib.auth import views
 from django.contrib.auth.forms import AuthenticationForm
 from django.http import HttpResponse
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.template.defaultfilters import capfirst
 
 from django.urls import reverse_lazy, reverse
@@ -30,17 +30,12 @@ class RegisterUser(generic.CreateView):
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
         if form.is_valid():
-            self.form_valid(form)
-            return self.success_url
+            form.save()
         return super().post(request, *args, **kwargs)
 
-    def form_valid(self, form):
-        form.save()
-        return super(RegisterUser, self).form_valid(form)
-
-    def form_invalid(self, form):
-        return self.render_to_response(self.get_context_data(form=form))
-
+    def get_success_url(self):
+        if self.success_url:
+            return self.success_url
 
 
 class UserLoginView(views.FormView):
@@ -51,10 +46,15 @@ class UserLoginView(views.FormView):
     def form_valid(self, form):
         user = UserShop(name=form.cleaned_data['name'])
         password = form.cleaned_data['password']
-        x = user.check_password(password)
-
+        x = user.check_password(raw_password=password)
+        if x:
+            return HttpResponse('otlichno')
         return HttpResponse('Net usera')
 
     def user_shop_add_in_session(self, user):
         self.request.session['user_slug'] = user.slug
         return self.success_url
+
+    def get_success_url(self):
+        if self.success_url:
+            return self.success_url
