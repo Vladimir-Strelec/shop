@@ -4,7 +4,7 @@ from django.contrib import auth
 from django.contrib.auth import views
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.hashers import make_password
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404, redirect
 from django.template.defaultfilters import capfirst
 
@@ -27,10 +27,11 @@ class RegisterUser(CreateView):
     model = UserShop
     form_class = RegisterUserForm
     template_name = "register_user.html"
+    success_url = reverse_lazy('users')
 
     def form_valid(self, form, *args, **kwargs):
         form.save()
-        return redirect(reverse_lazy('users'))
+        return HttpResponseRedirect(self.success_url)
     # def post(self, request, *args, **kwargs):
     #     form = self.form_class(request.POST)
     #     if form.is_valid():
@@ -55,15 +56,23 @@ class UserLoginView(views.FormView):
     success_url = reverse_lazy('create_product')
     form_class = LoginForm
 
+    # def dispatch(self, request, *args, **kwargs):
+    #     if self.request.session['user_slug']:
+    #         redirect_to = self.get_success_url()
+    #         return HttpResponseRedirect(redirect_to)
+
     def form_valid(self, form):
         current_user = get_object_or_404(UserShop, email=form.cleaned_data['email'])
         password = form.cleaned_data.get('password')
 
         if current_user.check_password(password):
-            return self.user_shop_add_in_session(current_user)
-        return HttpResponse('Net usera')
+            self.user_shop_add_in_session(current_user)
+            return super(UserLoginView, self).form_valid(form)
+
+        self.success_url = reverse_lazy('login')
+        return super(UserLoginView, self).form_valid(form)
 
     def user_shop_add_in_session(self, user):
         self.request.session['user_slug'] = user.slug
-        return redirect(reverse_lazy('users'))
+
 
