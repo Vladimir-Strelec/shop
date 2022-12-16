@@ -23,7 +23,7 @@ class UserShop(models.Model):
     telephone = models.IntegerField("Telephone number")
     address = models.CharField("Address", max_length=300)
     data_joined = models.DateTimeField("Data joined", default=timezone.now)
-
+    slug = models.SlugField(max_length=160, unique=True)
     is_active = models.BooleanField(default=True)
 
     class Meta:

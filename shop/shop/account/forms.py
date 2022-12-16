@@ -9,13 +9,14 @@ class RegisterUserForm(forms.models.ModelForm):
         model = UserShop
         fields = '__all__'
 
-    def save(self, *args, **kwargs):
+    def save(self, commit=False):
         user = UserShop.objects.create(**self.cleaned_data)
         user.password = user.set_password(user.password)
         user.save()
+        return self.instance
 
 
 class LoginForm(forms.Form):
-    name = forms.CharField(max_length=150)
+    email = forms.EmailField()
     password = forms.CharField(max_length=50)
 
