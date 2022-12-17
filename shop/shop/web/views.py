@@ -1,6 +1,8 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.http import response
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.urls import reverse_lazy
 from django.views import generic
 
 from shop.web.forms import CreateProductForm, CreateProductForm
@@ -13,11 +15,13 @@ class ProductView(generic.ListView):
     template_name = "index.html"
 
 
-class CreateProductView(generic.CreateView):
+class CreateProductView(generic.CreateView, LoginRequiredMixin):
     model = Product
     queryset = Product.objects.all()
     form_class = CreateProductForm
-    template_name = 'create-product.html'
+    success_url = reverse_lazy('create_product')
+
+
 
     # def form_valid(self, form):
     #     form.instance.owner = self.request.user
