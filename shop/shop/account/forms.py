@@ -7,7 +7,7 @@ from shop.account.models import UserShop
 class RegisterUserForm(forms.models.ModelForm):
     class Meta:
         model = UserShop
-        fields = '__all__'
+        fields = ('name', 'email', 'password', 'password', 'slug')
 
     def save(self, commit=False):
         user = UserShop.objects.create(**self.cleaned_data)
@@ -19,4 +19,5 @@ class RegisterUserForm(forms.models.ModelForm):
 class LoginForm(forms.Form):
     email = forms.EmailField()
     password = forms.CharField(max_length=50)
+    password2 = forms.CharField(max_length=50)
 

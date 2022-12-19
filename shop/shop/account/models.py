@@ -14,18 +14,16 @@ from django.dispatch import receiver
 from shop.validators.custom_validators import validate_only_letters
 User
 
+
 class UserShop(models.Model):
     name = models.CharField("Name", max_length=150, validators=(MinLengthValidator(2), validate_only_letters), )
     password = models.CharField("Password", max_length=50)
-    email = models.EmailField("Email", error_messages={
+    email = models.EmailField("Email", unique=True, error_messages={
         "unique": _(f"A Email with that Emails already exists."),
     }, )
-    telephone = models.IntegerField("Telephone number")
-    address = models.CharField("Address", max_length=300)
     data_joined = models.DateTimeField("Data joined", default=timezone.now)
     slug = models.SlugField(max_length=160, unique=True)
     is_active = models.BooleanField(default=False)
-    is_authenticated = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = _("user")
