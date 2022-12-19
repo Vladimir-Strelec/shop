@@ -26,7 +26,7 @@ class RegisterUser(CreateView):
 
     def form_valid(self, form, *args, **kwargs):
         form.save()
-        return super(RegisterUser, self).form_valid(form)
+        return redirect(reverse_lazy('products'))
 
 
 class UserLoginView(views.FormView):
