@@ -1,6 +1,6 @@
 
 from django.contrib import auth
-from django.contrib.auth import views
+from django.contrib.auth import views, authenticate, login
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
@@ -18,15 +18,21 @@ from shop.account.forms import RegisterUserForm, LoginForm
 from shop.account.models import UserShop
 
 
-class RegisterUser(CreateView):
+class RegisterUser(View):
     model = UserShop
     form_class = RegisterUserForm
     template_name = "register_user.html"
     success_url = reverse_lazy('products')
 
-    def form_valid(self, form, *args, **kwargs):
-        form.save()
-        return redirect(reverse_lazy('products'))
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name, {'form': self.form_class})
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect(self.success_url)
+        return render(request, self.template_name, {'form': self.form_class})
 
 
 class UserLoginView(views.FormView):
