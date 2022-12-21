@@ -18,21 +18,7 @@ from shop.account.forms import RegisterUserForm, LoginForm
 from shop.account.models import UserShop
 
 
-class RegisterUser(View):
-    model = UserShop
-    form_class = RegisterUserForm
-    template_name = "register_user.html"
-    success_url = reverse_lazy('products')
 
-    def get(self, request, *args, **kwargs):
-        return render(request, self.template_name, {'form': self.form_class})
-
-    def post(self, request, *args, **kwargs):
-        form = self.form_class(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect(self.success_url)
-        return render(request, self.template_name, {'form': self.form_class})
 
 
 class UserLoginView(views.FormView):
@@ -47,7 +33,7 @@ class UserLoginView(views.FormView):
 
         if current_user.check_password(password) and password == password2:
             self.user_shop_add_in_session(current_user)
-            return super(UserLoginView, self).form_valid(form)
+            return redirect(reverse_lazy('products'))
 
         self.success_url = reverse_lazy('login')
         return super(UserLoginView, self).form_valid(form)
@@ -55,3 +41,21 @@ class UserLoginView(views.FormView):
     def user_shop_add_in_session(self, user):
         self.request.session['user_slug'] = user.slug
 
+
+class RegisterUser(CreateView, UserLoginView):
+    model = UserShop
+    form_class = RegisterUserForm
+    template_name = "register_user.html"
+    success_url = reverse_lazy('products')
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name, {'form': self.form_class})
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST)
+
+        if form.is_valid():
+            form.save()
+            self.form_valid(form)
+            return redirect(self.success_url)
+        return render(request, self.template_name, {'form': self.form_class})
