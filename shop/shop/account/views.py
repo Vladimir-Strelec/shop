@@ -16,9 +16,7 @@ from django.views.generic import CreateView
 
 from shop.account.forms import RegisterUserForm, LoginForm
 from shop.account.models import UserShop
-
-
-
+from shop.account.utils import send_email_for_verify
 
 
 class UserLoginView(views.FormView):
@@ -46,7 +44,6 @@ class RegisterUser(CreateView, UserLoginView):
     model = UserShop
     form_class = RegisterUserForm
     template_name = "register_user.html"
-    success_url = reverse_lazy('products')
 
     def get(self, request, *args, **kwargs):
         return render(request, self.template_name, {'form': self.form_class})
@@ -55,7 +52,13 @@ class RegisterUser(CreateView, UserLoginView):
         form = self.form_class(request.POST)
 
         if form.is_valid():
-            form.save()
+            user = form.save()
+            user_with_id = UserShop.objects.get(slug=user.slug)
             self.form_valid(form)
-            return redirect(self.success_url)
+            x = send_email_for_verify(request, user_with_id)
+            return redirect('confirm_email')
         return render(request, self.template_name, {'form': self.form_class})
+
+
+class VerifyEmailView(View):
+    pass

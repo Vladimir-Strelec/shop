@@ -1,7 +1,9 @@
 from django.contrib.auth import authenticate, get_user_model
+from django.contrib.auth.forms import UserCreationForm
 from django.forms.models import ModelForm
 from django import forms
 from shop.account.models import UserShop
+UserCreationForm
 
 
 class RegisterUserForm(forms.models.ModelForm, forms.Form):
@@ -21,6 +23,15 @@ class RegisterUserForm(forms.models.ModelForm, forms.Form):
         user.password = user.set_password(user.password)
         user.save()
         return self.instance
+
+    # def save(self, commit=False):
+    #     user = super().save(
+    #         commit=False)
+    #     user.password = user.set_password(user.password)
+    #     user.save()
+    #     if commit:
+    #         user.save()
+    #     return user
 
 
 class LoginForm(forms.Form):
