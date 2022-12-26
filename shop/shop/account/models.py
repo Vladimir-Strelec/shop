@@ -24,6 +24,7 @@ class UserShop(models.Model):
     data_joined = models.DateTimeField("Data joined", default=timezone.now)
     slug = models.SlugField(max_length=160, unique=True)
     is_active = models.BooleanField(default=False)
+    auth_user = models.BooleanField(default=False)
 
     class Meta:
         verbose_name = _("user")
