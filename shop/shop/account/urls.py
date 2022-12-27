@@ -8,6 +8,7 @@ urlpatterns = (
 
     path('login/', UserLoginView.as_view(), name='login'),
 
-    path('confirm_email/', VerifyEmailView.as_view(), name='verify_email'),
-    path('verify_email/<uidb64>/<token>/', TemplateView.as_view(template_name='confirm_email.html'), name='confirm_email'),
+    path('confirm/email/', VerifyEmailView.as_view(), name='verify_email'),
+    path('verify/email/<uidb64>/<token>/', TemplateView.as_view(template_name='confirm_email.html'),
+         name='confirm_email'),
 )

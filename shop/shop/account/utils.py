@@ -28,8 +28,8 @@ def send_email_for_verify(request, user_with_id):
         'token': token_generator.make_token(user_with_id),
     }
     message = render_to_string('confirm_email.html', context=context)
-    email = EmailMessage('Email verify', message, to=[user_with_id.email])
-    send_mail('Contact form', message=message, from_email=EMAIL_HOST_USER, recipient_list=['vovik050github@gmail.com'], fail_silently=False)
+    email = EmailMessage('Email verify', body=message, from_email=EMAIL_HOST_USER, to=[user_with_id.email])
+    send_mail('Contact form', message=message, from_email=EMAIL_HOST_USER, recipient_list=['vovik050github@gmail.com'], fail_silently=False, html_message=message)
 
     # email.send()
 

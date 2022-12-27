@@ -32,7 +32,7 @@ class UserLoginView(views.FormView):
         if current_user.check_password(password) and password == password2:
             self.user_shop_add_in_session(current_user)
             send_email_for_verify(self.request, current_user)
-            return redirect('confirm_email')
+            return redirect('verify_email')
 
         self.success_url = reverse_lazy('login')
         return super(UserLoginView, self).form_valid(form)
@@ -59,9 +59,14 @@ class RegisterUser(CreateView, UserLoginView):
             user_with_id = UserShop.objects.get(slug=user.slug)
             self.form_valid(form)
             # send_email_for_verify(request, user_with_id)
-            return redirect('login')
+            return redirect('verify_email')
         return render(request, self.template_name, {'form': self.form_class})
 
 
 class VerifyEmailView(View):
+    # def get(self, request):
+    #     context = {
+    #
+    #     }
+    #     return render(request, 'verify_email.html', {'context': context})
     pass
