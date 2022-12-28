@@ -1,16 +1,18 @@
 
 from django.contrib import auth
 from django.contrib.auth import views, authenticate, login
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm, UserModel
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404, redirect
 from django.template.defaultfilters import capfirst
 
 from django.urls import reverse_lazy, reverse
 from django.utils.functional import lazy
+from django.utils.http import urlsafe_base64_decode
 from django.views import generic, View
 from django.views.generic import CreateView
 
@@ -30,17 +32,11 @@ class UserLoginView(views.FormView):
         password2 = form.cleaned_data.get('password2')
 
         if current_user.check_password(password) and password == password2:
-            self.user_shop_add_in_session(current_user)
-            send_email_for_verify(self.request, current_user)
-            return redirect('verify_email')
+
+            return send_email_for_verify(self.request, current_user)
 
         self.success_url = reverse_lazy('login')
         return super(UserLoginView, self).form_valid(form)
-
-    def user_shop_add_in_session(self, user):
-        self.request.session['user_slug'] = user.slug
-        user.auth_user = True
-
 
 
 class RegisterUser(CreateView, UserLoginView):
@@ -55,18 +51,38 @@ class RegisterUser(CreateView, UserLoginView):
         form = self.form_class(request.POST)
 
         if form.is_valid():
-            user = form.save()
-            user_with_id = UserShop.objects.get(slug=user.slug)
+            form.save()
             self.form_valid(form)
-            # send_email_for_verify(request, user_with_id)
-            return redirect('verify_email')
+            return redirect('confirm_amail')
         return render(request, self.template_name, {'form': self.form_class})
 
 
 class VerifyEmailView(View):
-    # def get(self, request):
-    #     context = {
-    #
-    #     }
-    #     return render(request, 'verify_email.html', {'context': context})
-    pass
+
+    def get(self, request, uidb64, token):
+        user = self.get_user(uidb64)
+        if user:
+            self.user_shop_add_in_session(user)
+
+        return render(request, 'index.html')
+
+    def user_shop_add_in_session(self, user):
+        self.request.session['user_slug'] = user.slug
+        user.auth_user = True
+
+    @staticmethod
+    def get_user(uidb64):
+        try:
+            # urlsafe_base64_decode() decodes to bytestring
+            uid = urlsafe_base64_decode(uidb64).decode()
+            user = UserShop.objects.get(id=uid)
+        except (
+            TypeError,
+            ValueError,
+            OverflowError,
+            UserModel.DoesNotExist,
+            ValidationError,
+        ):
+            user = None
+        return user
+

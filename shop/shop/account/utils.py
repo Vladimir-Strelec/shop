@@ -5,6 +5,7 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import EmailMessage, send_mail
 from django.template.loader import render_to_string
+
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.conf import settings
@@ -27,11 +28,11 @@ def send_email_for_verify(request, user_with_id):
         'uid': urlsafe_base64_encode(force_bytes(user_with_id.id)),
         'token': token_generator.make_token(user_with_id),
     }
-    message = render_to_string('confirm_email.html', context=context)
+    message = render_to_string('verify_email.html', context=context)
     email = EmailMessage('Email verify', body=message, from_email=EMAIL_HOST_USER, to=[user_with_id.email])
-    send_mail('Contact form', message=message, from_email=EMAIL_HOST_USER, recipient_list=['vovik050github@gmail.com'], fail_silently=False, html_message=message)
+    # send_mail('Contact form', message=message, from_email=EMAIL_HOST_USER, recipient_list=['vovik050github@gmail.com'], fail_silently=False, html_message=message)
 
-    # email.send()
+    email.send()
 
 
 
