@@ -12,6 +12,7 @@ ALLOWED_HOSTS = []
 
 
 INSTALLED_APPS = [
+    'crispy_forms',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -104,4 +105,6 @@ EMAIL_HOST_USER = 'vovikgithub@gmail.com'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_PASSWORD = "ssirpwzutlwslqwb"
+EMAIL_HOST_PASSWORD = "yjjuwotgzpfzkjfw"
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'

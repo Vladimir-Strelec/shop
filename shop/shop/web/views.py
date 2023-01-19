@@ -9,7 +9,7 @@ from shop.web.models import Product
 
 class ProductView(CheckLogin, generic.ListView):
     model = Product
-    template_name = "index.html"
+    template_name = "base.html"
 
 
 class CreateProductView(generic.CreateView, LoginRequiredMixin):

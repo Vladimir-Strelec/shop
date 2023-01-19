@@ -22,7 +22,7 @@ from shop.account.utils import send_email_for_verify
 
 
 class UserLoginView(views.FormView):
-    template_name = 'login.html'
+    template_name = 'login-logout/login.html'
     success_url = reverse_lazy('products')
     form_class = LoginForm
 
@@ -42,7 +42,7 @@ class UserLoginView(views.FormView):
 class RegisterUser(CreateView, UserLoginView):
     model = UserShop
     form_class = RegisterUserForm
-    template_name = "register_user.html"
+    template_name = "account-register/register_user.html"
 
     def get(self, request, *args, **kwargs):
         return render(request, self.template_name, {'form': self.form_class})
